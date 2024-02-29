@@ -7,18 +7,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -35,19 +32,16 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
-import com.kizitonwose.calendar.core.firstDayOfWeekFromLocale
-import com.maxkeppeker.sheets.core.models.base.rememberUseCaseState
-import com.maxkeppeler.sheets.calendar.CalendarDialog
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
 fun CustomDatePicker() {
+    // 今の月
     val currentMonth = remember { YearMonth.now() }
     // 現在より前の年月
     val startMonth = remember { currentMonth.minusMonths(100) }
@@ -55,6 +49,11 @@ fun CustomDatePicker() {
     val endMonth = remember { currentMonth.plusMonths(100) }
     // 曜日
     val daysOfWeek = remember { daysOfWeek() }
+
+    var selectionDay by remember { mutableStateOf<LocalDate?>(null) }
+    var selection by remember { mutableStateOf<CalendarDay?>(null) }
+    var isSelected: Boolean by remember { mutableStateOf(false) }
+
     // カレンダーの状態を持つ
     val state = rememberCalendarState(
         startMonth = startMonth,
@@ -65,27 +64,34 @@ fun CustomDatePicker() {
     )
 
     Column {
-
+        Text(text = "日付 : $selectionDay", modifier = Modifier.padding(10.dp))
         HorizontalCalendar(
             state = state,
             // 日付を表示する部分
-            dayContent = {Day(it)},
+            dayContent = {
+                Day(it, isSelected = selection == it) { clickDay ->
+//                    println("clickDay: ${clickDay.date}")
+                    selection = clickDay
+                    selectionDay = clickDay.date
+                }
+            },
             // カレンダーのヘッダー
-//            monthHeader = {DaysOfWeekTitle(daysOfWeek = daysOfWeek)}
             monthHeader = { month ->
-                val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
-                MonthHeader(daysOfWeek = daysOfWeek)
+                DaysOfWeekTitle(daysOfWeek = daysOfWeek)
+//                val daysOfWeek = month.weekDays.first().map { it.date.dayOfWeek }
+//                MonthHeader(daysOfWeek = daysOfWeek)
             },
             monthBody = { _, content ->
                 Box(
-                    modifier = Modifier.background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)
+                    modifier = Modifier
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)
+                                )
                             )
                         )
-                    )
                         .border(width = 0.5.dp, color = Color.LightGray) // 追加
                 ) {
                     content()
@@ -94,6 +100,8 @@ fun CustomDatePicker() {
         )
     }
 }
+
+
 @Composable
 fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
     Row(
@@ -112,8 +120,16 @@ fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
     }
 }
 
+
 @Composable
-private fun Day(day: CalendarDay) {
+private fun Day(
+    day: CalendarDay,
+    isSelected: Boolean = false, // ← 追加
+    onClick: (CalendarDay) -> Unit = {}
+) {
+    val boxColor = remember { Color.Magenta }
+    var selectBool by remember { mutableStateOf(false) }
+
     val textColor = when (day.position) {
         DayPosition.MonthDate -> when (day.date.dayOfWeek) {
             DayOfWeek.SATURDAY -> Color.Blue
@@ -126,8 +142,12 @@ private fun Day(day: CalendarDay) {
     Box(
         modifier = Modifier
             .aspectRatio(1f)
+            .background(color = if (isSelected) Color.Cyan else Color.Transparent) // ← 追加
             .border(width = 0.5.dp, color = Color.LightGray)
-            .padding(1.dp),
+            .padding(1.dp)
+            .clickable(enabled = day.position == DayPosition.MonthDate) {
+                onClick(day)
+            },
         contentAlignment = Alignment.Center
     ) {
         Text(
