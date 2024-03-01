@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "102781788856",
+    "project_id": "calendar-sample-a5b7b",
+    "storage_bucket": "calendar-sample-a5b7b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102781788856:android:0e3f3745be984a3f418a4d",
+        "android_client_info": {
+          "package_name": "jp.ac.it_college.std.s22004.calendar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF5_pV_nqHGIdiKZgWWL07IiKsiuT_emA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
