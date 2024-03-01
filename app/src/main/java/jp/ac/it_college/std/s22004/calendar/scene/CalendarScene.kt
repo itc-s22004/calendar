@@ -1,25 +1,36 @@
 package jp.ac.it_college.std.s22004.calendar.scene
 
+import android.content.Context
+import android.support.v4.os.IResultReceiver2.Default
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,6 +44,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -40,8 +52,10 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun CustomDatePicker() {
-    // 今の月
+fun CustomDatePicker(
+    modifier: Modifier = Modifier,
+    onDayClick: (CalendarDay) -> Unit = {}
+) {
     val currentMonth = remember { YearMonth.now() }
     // 現在より前の年月
     val startMonth = remember { currentMonth.minusMonths(100) }
@@ -53,6 +67,7 @@ fun CustomDatePicker() {
     var selectionDay by remember { mutableStateOf<LocalDate?>(null) }
     var selection by remember { mutableStateOf<CalendarDay?>(null) }
     var isSelected: Boolean by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     // カレンダーの状態を持つ
     val state = rememberCalendarState(
@@ -62,8 +77,20 @@ fun CustomDatePicker() {
         firstDayOfWeek = daysOfWeek.first(),
         outDateStyle = OutDateStyle.EndOfGrid
     )
+    val textColor = when (selection?.position) {
+        DayPosition.MonthDate -> when (selection?.date?.dayOfWeek) {
+            DayOfWeek.SATURDAY -> Color.Blue
+            DayOfWeek.SUNDAY -> Color.Red
+            else -> Color.Unspecified
+        }
 
-    Column {
+        DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
+        else -> Color.Unspecified
+    }
+
+    Column(
+
+    ) {
         Text(text = "日付 : $selectionDay", modifier = Modifier.padding(10.dp))
         HorizontalCalendar(
             state = state,
@@ -73,7 +100,31 @@ fun CustomDatePicker() {
 //                    println("clickDay: ${clickDay.date}")
                     selection = clickDay
                     selectionDay = clickDay.date
+
                 }
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(0.5f)
+                        .background(color = if (isSelected) Color.Cyan else Color.Transparent) // ← 追加
+                        .border(width = 0.5.dp, color = Color.LightGray)
+                        .padding(1.dp)
+                        .clickable(enabled = it.position == DayPosition.MonthDate) {
+                            selectionDay = it.date
+                            selection = it
+                            onDayClick(selection!!)
+                            println(selection)
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(top = 3.dp, start = 4.dp),
+                        text = it.date.dayOfMonth.toString() , color = textColor
+                    )
+
+                }
+
             },
             // カレンダーのヘッダー
             monthHeader = { month ->
@@ -98,26 +149,11 @@ fun CustomDatePicker() {
                 }
             },
         )
-    }
-}
-
-
-@Composable
-fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        for ((index, dayOfWeek) in daysOfWeek.withIndex()) {
-            Text(
-                modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Center,
-                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                // 土日だけそれぞれ色を変えたいので対応したカラーコードを返している
-//                color = getDayOfWeekTextColor(index)
-            )
+        if (isSelected) {
+            BottomSheet(context)
         }
     }
+
 }
 
 
@@ -129,6 +165,10 @@ private fun Day(
 ) {
     val boxColor = remember { Color.Magenta }
     var selectBool by remember { mutableStateOf(false) }
+//    var bottomSheetBool by remember {
+//        mutableStateOf(false)
+//    }
+    val context = LocalContext.current
 
     val textColor = when (day.position) {
         DayPosition.MonthDate -> when (day.date.dayOfWeek) {
@@ -141,14 +181,16 @@ private fun Day(
     }
     Box(
         modifier = Modifier
-            .aspectRatio(1f)
+            .aspectRatio(0.5f)
             .background(color = if (isSelected) Color.Cyan else Color.Transparent) // ← 追加
             .border(width = 0.5.dp, color = Color.LightGray)
             .padding(1.dp)
             .clickable(enabled = day.position == DayPosition.MonthDate) {
                 onClick(day)
+
+//                bottomSheetBool = true
             },
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             modifier = Modifier
@@ -156,8 +198,20 @@ private fun Day(
                 .padding(top = 3.dp, start = 4.dp),
             text = day.date.dayOfMonth.toString(), color = textColor
         )
+
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun StartScenePreview() {
+    CalendarTheme {
+        CustomDatePicker()
+//        ProfileScreen()
     }
 }
+
 
 fun DayOfWeek.displayText(uppercase: Boolean = false): String {
     return getDisplayName(TextStyle.SHORT, Locale.getDefault()).let { value ->
@@ -184,11 +238,44 @@ private fun MonthHeader(daysOfWeek: List<DayOfWeek>) {
     }
 }
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StartScenePreview() {
-    CalendarTheme {
-//        CalendarScene(2024)
-        CustomDatePicker()
+fun BottomSheet(context: Context) {
+    var openBottomSheet by rememberSaveable { mutableStateOf(false) }
+    var skipPartiallyExpanded by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded
+    )
+
+    ModalBottomSheet(
+        modifier = Modifier.padding(top = 16.dp),
+        onDismissRequest = { openBottomSheet = false },
+        sheetState = bottomSheetState,
+    ) {
+        Column(
+            modifier = Modifier.padding(start = 16.dp, bottom = 24.dp)
+        ) {
+            Text(text = "ボトムシート")
+        }
+    }
+}
+
+
+@Composable
+fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        for ((index, dayOfWeek) in daysOfWeek.withIndex()) {
+            Text(
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center,
+                text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                // 土日だけそれぞれ色を変えたいので対応したカラーコードを返している
+//                color = getDayOfWeekTextColor(index)
+            )
+        }
     }
 }

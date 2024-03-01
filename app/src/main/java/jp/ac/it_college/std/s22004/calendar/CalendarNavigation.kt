@@ -28,17 +28,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.DayPosition
 import jp.ac.it_college.std.s22004.calendar.scene.CustomDatePicker
+import jp.ac.it_college.std.s22004.calendar.scene.NextScene
+//import jp.ac.it_college.std.s22004.calendar.scene.ProfileScreen
 import jp.ac.it_college.std.s22004.calendar.scene.StartScenePreview
+import java.time.LocalDate
 
 //import jp.ac.it_college.std.s22004.calendar.scene.CalendarScene
 
 
 object Destinations {
     const val START = "start"
-    const val ENCRYPTION = "encryption"
-    const val DECRYPTION = "decryption"
-    const val RESULT_ENC = "result_enc"
+    const val DAY = "day"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,20 +50,17 @@ fun CalenderNavigation(
     navController: NavHostController = rememberNavController(),
 ) {
     var titleText by remember { mutableStateOf("") }
-    var bm by remember {
-        mutableStateOf(
-            Bitmap.createBitmap(
-                1,
-                1,
-                Bitmap.Config.ARGB_8888
-            )
-        )
-    }
+//    var calendarDay by remember {  }
+
     var showText by remember { mutableStateOf(false) }
     var selectNum by remember { mutableIntStateOf(0) }
 
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var calendarDay = CalendarDay(
+        date = LocalDate.now(), // 現在の日付
+        position = DayPosition.MonthDate // 位置は仮にMIDDLEとします
+    )
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -94,7 +94,20 @@ fun CalenderNavigation(
             ) {
                 composable(Destinations.START) {
                     titleText = "スタート画面"
-                    CustomDatePicker()
+                    CustomDatePicker(
+                        modifier = Modifier, // ここではModifierをデフォルト値で指定しています。
+                        onDayClick = {day ->
+                            calendarDay = day
+                            navController.navigate(Destinations.DAY)
+                        }
+                    )
+
+//                    navController.navigate(Destinations.DAY)
+//                    ProfileScreen()
+                }
+                composable(Destinations.DAY) {
+                    titleText = "選んだ日付"
+                    NextScene(Modifier, calendarDay)
                 }
             }
         }
