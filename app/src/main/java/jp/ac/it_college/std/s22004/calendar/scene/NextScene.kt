@@ -1,5 +1,7 @@
 package jp.ac.it_college.std.s22004.calendar.scene
 
+import android.app.TimePickerDialog
+import android.widget.TimePicker
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +30,8 @@ import jp.ac.it_college.std.s22004.calendar.compose.addScheduleToFirestore
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 //import com.google.firebase.database.Fi
 
@@ -55,8 +60,11 @@ fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
 @Composable
 fun ScheduleDialog(day: LocalDate) {
     var showDialog: Boolean by remember { mutableStateOf(false) }
-    var time by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf<LocalTime?>(null) }
     var schedule by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
 
     Button(onClick = { showDialog = true }) {
         Text("スケジュールを追加")
@@ -68,11 +76,22 @@ fun ScheduleDialog(day: LocalDate) {
             title = { Text("スケジュールを追加") },
             text = {
                 Column {
-                    TextField(
-                        value = time,
-                        onValueChange = { time = it },
-                        label = { Text("時間") }
-                    )
+//                    TextField(
+//                        value = time,
+//                        onValueChange = { time = it },
+//                        label = { Text("時間") }
+//                    )
+                    Button(onClick = {
+                        val calendar = Calendar.getInstance()
+                        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                        val minute = calendar.get(Calendar.MINUTE)
+                        TimePickerDialog(context, { _: TimePicker, hourOfDay: Int, minuteOfHour: Int ->
+//                            time = "$hourOfDay:$minuteOfHour"
+                            time = LocalTime.of(hourOfDay, minuteOfHour)
+                        }, hour, minute, true).show()
+                    }) {
+                        Text(if (time == null) "時間を選択" else time!!.format(timeFormatter))
+                    }
                     TextField(
                         value = schedule,
                         onValueChange = { schedule = it },
@@ -93,7 +112,7 @@ fun ScheduleDialog(day: LocalDate) {
                         )
                         myRef.push().setValue(scheduleEntry)
                         showDialog = false
-                        addScheduleToFirestore(day, time, schedule)
+                        addScheduleToFirestore(day, time!!, schedule)
                     }
                 ) {
                     Text("OK")
@@ -119,4 +138,17 @@ fun NextScenePreview() {
             )
         )
     }
+}
+
+@Composable
+fun TimeDialog() {
+    val context = LocalContext.current
+    var time by remember { mutableStateOf<LocalTime?>(null) }
+
+    val calendar = Calendar.getInstance()
+    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+    val minute = calendar.get(Calendar.MINUTE)
+    TimePickerDialog(context, { _: TimePicker, hourOfDay: Int, minuteOfHour: Int ->
+        time = LocalTime.of(hourOfDay, minuteOfHour)
+    }, hour, minute, true).show()
 }
