@@ -44,19 +44,12 @@ object Destinations {
     const val DAY = "day"
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalenderNavigation(
     navController: NavHostController = rememberNavController(),
 ) {
     var titleText by remember { mutableStateOf("") }
-//    var calendarDay by remember {  }
 
-    var showText by remember { mutableStateOf(false) }
-    var selectNum by remember { mutableIntStateOf(0) }
-
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     var calendarDay = CalendarDay(
         date = LocalDate.now(), // 現在の日付
         position = DayPosition.MonthDate // 位置は仮にMIDDLEとします
@@ -65,28 +58,7 @@ fun CalenderNavigation(
     Surface(
         modifier = Modifier.fillMaxSize(),
     ) {
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    title = { Text(text = titleText) },
-                    navigationIcon = {
-                        if (titleText != "スタート画面") {
-                            IconButton(onClick = { navController.popBackStack() }) {
-                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                            }
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { showText = true }) {
-                            Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
-                        }
-                    }
-                )
-            },
-        ) {
+        Scaffold() {
             NavHost(
                 navController = navController,
                 startDestination = Destinations.START,
@@ -95,15 +67,12 @@ fun CalenderNavigation(
                 composable(Destinations.START) {
                     titleText = "スタート画面"
                     CustomDatePicker(
-                        modifier = Modifier, // ここではModifierをデフォルト値で指定しています。
+                        modifier = Modifier,
                         onDayClick = {day ->
                             calendarDay = day
                             navController.navigate(Destinations.DAY)
                         }
                     )
-
-//                    navController.navigate(Destinations.DAY)
-//                    ProfileScreen()
                 }
                 composable(Destinations.DAY) {
                     titleText = "選んだ日付"
