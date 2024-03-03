@@ -96,12 +96,12 @@ fun CustomDatePicker(
             state = state,
             // 日付を表示する部分
             dayContent = {
-                Day(it, isSelected = selection == it) { clickDay ->
-//                    println("clickDay: ${clickDay.date}")
-                    selection = clickDay
-                    selectionDay = clickDay.date
-
-                }
+//                Day(it, isSelected = selection == it) { clickDay ->
+////                    println("clickDay: ${clickDay.date}")
+//                    selection = clickDay
+//                    selectionDay = clickDay.date
+//
+//                }
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
@@ -157,51 +157,52 @@ fun CustomDatePicker(
 }
 
 
-@Composable
-private fun Day(
-    day: CalendarDay,
-    isSelected: Boolean = false, // ← 追加
-    onClick: (CalendarDay) -> Unit = {}
-) {
-    val boxColor = remember { Color.Magenta }
-    var selectBool by remember { mutableStateOf(false) }
-//    var bottomSheetBool by remember {
-//        mutableStateOf(false)
+// いらないかも
+//@Composable
+//private fun Day(
+//    day: CalendarDay,
+//    isSelected: Boolean = false, // ← 追加
+//    onClick: (CalendarDay) -> Unit = {}
+//) {
+//    val boxColor = remember { Color.Magenta }
+//    var selectBool by remember { mutableStateOf(false) }
+////    var bottomSheetBool by remember {
+////        mutableStateOf(false)
+////    }
+//    val context = LocalContext.current
+//
+//    val textColor = when (day.position) {
+//        DayPosition.MonthDate -> when (day.date.dayOfWeek) {
+//            DayOfWeek.SATURDAY -> Color.Blue
+//            DayOfWeek.SUNDAY -> Color.Red
+//            else -> Color.Unspecified
+//        }
+//
+//        DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
 //    }
-    val context = LocalContext.current
-
-    val textColor = when (day.position) {
-        DayPosition.MonthDate -> when (day.date.dayOfWeek) {
-            DayOfWeek.SATURDAY -> Color.Blue
-            DayOfWeek.SUNDAY -> Color.Red
-            else -> Color.Unspecified
-        }
-
-        DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
-    }
-    Box(
-        modifier = Modifier
-            .aspectRatio(0.5f)
-            .background(color = if (isSelected) Color.Cyan else Color.Transparent) // ← 追加
-            .border(width = 0.5.dp, color = Color.LightGray)
-            .padding(1.dp)
-            .clickable(enabled = day.position == DayPosition.MonthDate) {
-                onClick(day)
-
-//                bottomSheetBool = true
-            },
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 3.dp, start = 4.dp),
-            text = day.date.dayOfMonth.toString(), color = textColor
-        )
-
-    }
-
-}
+//    Box(
+//        modifier = Modifier
+//            .aspectRatio(0.5f)
+//            .background(color = if (isSelected) Color.Cyan else Color.Transparent) // ← 追加
+//            .border(width = 0.5.dp, color = Color.LightGray)
+//            .padding(1.dp)
+//            .clickable(enabled = day.position == DayPosition.MonthDate) {
+//                onClick(day)
+//
+////                bottomSheetBool = true
+//            },
+//        contentAlignment = Alignment.Center,
+//    ) {
+//        Text(
+//            modifier = Modifier
+//                .align(Alignment.TopStart)
+//                .padding(top = 3.dp, start = 4.dp),
+//            text = day.date.dayOfMonth.toString(), color = textColor
+//        )
+//
+//    }
+//
+//}
 
 @Preview(showBackground = true)
 @Composable
@@ -273,7 +274,6 @@ fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
-                // 土日だけそれぞれ色を変えたいので対応したカラーコードを返している
 //                color = getDayOfWeekTextColor(index)
             )
         }

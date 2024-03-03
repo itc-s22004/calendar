@@ -97,5 +97,7 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-database:20.0.3")
 
+    implementation(platform("com.google.firebase:firebase-bom:32.4.1"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
 }
