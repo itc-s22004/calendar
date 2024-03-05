@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,9 +36,12 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
 import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
+//import jp.ac.it_college.std.s22004.calendar.api.Api
+//import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
 //import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
 //import jp.ac.it_college.std.s22004.calendar.compose.HolidayColor
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -62,6 +67,8 @@ fun CustomDatePicker(
     var isSelected: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
 //    val holidaysList = GetHoliday()
+    val scope = rememberCoroutineScope()
+
 
     // カレンダーの状態を持つ
     val state = rememberCalendarState(
@@ -71,6 +78,14 @@ fun CustomDatePicker(
         firstDayOfWeek = daysOfWeek.first(),
         outDateStyle = OutDateStyle.EndOfGrid
     )
+//    LaunchedEffect(Unit) {
+//        scope.launch {
+//            val apiDate = Api.getApi().data
+//            val apiLocalDate = Api.getApi().localName
+//
+//            println(apiDate)
+//        }
+//    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
@@ -95,13 +110,14 @@ fun CustomDatePicker(
                     DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
                     else -> Color.Unspecified
                 }
-                val isHoliday = GetHoliday().any { holiday ->
+                val isHoliday = GetHoliday().any { holiday ->                                // 祝日
                     holiday.date == day.date.toString()
                 } ?: false
+
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
-                        .background(color = if (isHoliday) Color.Cyan else Color.Transparent) // ← 追加
+                        .background(color = if (isHoliday) Color.Cyan else Color.Transparent) // 祝日
                         .border(width = 0.5.dp, color = Color.LightGray)
                         .padding(1.dp)
                         .clickable(enabled = day.position == DayPosition.MonthDate) {
@@ -141,7 +157,7 @@ fun CustomDatePicker(
                 ) {
                     content()
                 }
-            },
+            }
         )
     }
 

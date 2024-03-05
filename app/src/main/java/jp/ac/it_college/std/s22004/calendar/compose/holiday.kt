@@ -1,36 +1,20 @@
 package jp.ac.it_college.std.s22004.calendar.compose
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
-import com.kizitonwose.calendar.core.CalendarDay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.time.LocalDate
-import java.util.Date
-import java.util.Dictionary
+//import jp.ac.it_college.std.s22004.calendar.api.Api
 
 data class Holiday(
     val date: String,
@@ -72,9 +56,11 @@ suspend fun fetchHolidays(): String? {
 
 @Composable
 fun GetHoliday(): List<Holiday> {
+//fun GetHoliday() {
+    val scope = rememberCoroutineScope()
 //    var holidays by remember { mutableStateOf<List<Holiday>?>(null) }
     var holidays by remember {
-        mutableStateOf<List<Holiday>?>(listOf(Holiday(date="2023-01-01", name="元日")))
+        mutableStateOf<List<Holiday>?>(listOf(Holiday(date = "2023-01-01", name = "元日")))
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -90,6 +76,12 @@ fun GetHoliday(): List<Holiday> {
             holidays = parsedHolidays
         }
     }
+//    LaunchedEffect(Unit) {
+//        scope.launch {
+//            val apiDate = Api.getApi().data
+//            val apiLocalDate = Api.getApi().localName
+//        }
+//    }
 
     return holidays!!
 

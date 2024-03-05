@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+
+//    kotlin("plugin.serialization")
 }
 
 android {
@@ -102,5 +104,10 @@ dependencies {
     //OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
+//    // Ktor
+//    implementation("io.ktor:ktor-client-core:2.3.6")
+//    implementation("io.ktor:ktor-client-cio:2.3.6")
+//    implementation("io.ktor:ktor-client-content-negotiation:2.3.6")
+//    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.6")
 
 }
