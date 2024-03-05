@@ -33,6 +33,8 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
+import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
+//import jp.ac.it_college.std.s22004.calendar.compose.HolidayColor
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -46,6 +48,7 @@ fun CustomDatePicker(
     onDayClick: (CalendarDay) -> Unit = {}
 ) {
     val currentMonth = remember { YearMonth.now() }
+
     // 現在より前の年月
     val startMonth = remember { currentMonth.minusMonths(100) }
     // 現在より後の年月
@@ -66,6 +69,7 @@ fun CustomDatePicker(
         firstDayOfWeek = daysOfWeek.first(),
         outDateStyle = OutDateStyle.EndOfGrid
     )
+    GetHoliday()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -89,6 +93,7 @@ fun CustomDatePicker(
                     DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
                     else -> Color.Unspecified
                 }
+//                val holidayColor =
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
@@ -109,6 +114,7 @@ fun CustomDatePicker(
                             .padding(top = 3.dp, start = 4.dp),
                         text = it.date.dayOfMonth.toString() , color = textColor
                     )
+//                    HolidayColor(date = currentMonth.monthValue, holidays = )
 
                 }
 

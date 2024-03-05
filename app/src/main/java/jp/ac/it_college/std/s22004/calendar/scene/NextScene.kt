@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
@@ -64,20 +65,19 @@ fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
             textAlign = TextAlign.Start
         )
 
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Column {
-                getDate(calendarDay).forEach { schedule ->
-                    Column {
-                        Text("Time: ${schedule.time} ,Schedule: ${schedule.schedule}")
-                    }
-                    println(schedule)
+        Box(modifier = Modifier.fillMaxWidth())
+        Column(
+        ) {
+            getDate(calendarDay).forEach { schedule ->
+                Column {
+                    Text("${schedule.time}:${schedule.schedule}", fontSize = 30.sp)
                 }
+                println(schedule)
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ScheduleDialog(day: LocalDate) {
     var showDialog: Boolean by remember { mutableStateOf(false) }

@@ -54,7 +54,7 @@ fun getDate(calendarDay: CalendarDay): List<Schedule> {
                         fetchedSchedules.add(Schedule(date, time, schedule))
                     }
                 }
-                schedulesList = fetchedSchedules
+                schedulesList = fetchedSchedules.sortedBy { it.time }
             }
     }
     return schedulesList

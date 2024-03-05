@@ -56,9 +56,6 @@ dependencies {
 //    implementation("com.kizitonwose.calendar:compose:2.2.0")
     implementation("com.kizitonwose.calendar:compose:2.0.4")
 
-
-
-
     val composeBom = platform("androidx.compose:compose-bom")
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -99,5 +96,11 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:32.4.1"))
     implementation("com.google.firebase:firebase-firestore-ktx")
+
+    //祝日API
+    implementation("com.google.code.gson:gson:2.8.6")
+    //OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
+
 
 }
