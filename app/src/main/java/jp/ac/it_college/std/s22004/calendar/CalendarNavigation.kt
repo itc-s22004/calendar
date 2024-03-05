@@ -30,7 +30,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
-import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
 import jp.ac.it_college.std.s22004.calendar.scene.CustomDatePicker
 import jp.ac.it_college.std.s22004.calendar.scene.NextScene
 //import jp.ac.it_college.std.s22004.calendar.scene.ProfileScreen

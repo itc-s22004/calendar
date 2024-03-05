@@ -29,6 +29,8 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.time.LocalDate
+import java.util.Date
+import java.util.Dictionary
 
 data class Holiday(
     val date: String,
@@ -69,10 +71,14 @@ suspend fun fetchHolidays(): String? {
 }
 
 @Composable
-fun GetHoliday() {
-    var holidays by remember { mutableStateOf<List<Holiday>?>(null) }
-    val coroutineScope = rememberCoroutineScope()
+fun GetHoliday(): List<Holiday> {
+//    var holidays by remember { mutableStateOf<List<Holiday>?>(null) }
+    var holidays by remember {
+        mutableStateOf<List<Holiday>?>(listOf(Holiday(date="2023-01-01", name="元日")))
+    }
 
+    val coroutineScope = rememberCoroutineScope()
+    val holidayMap = remember { mutableStateOf<Map<String, String>?>(null) }
 
     LaunchedEffect(key1 = Unit) {
         coroutineScope.launch {
@@ -85,16 +91,8 @@ fun GetHoliday() {
         }
     }
 
-    holidays?.let {
-        LazyColumn {
-            items(it) { holiday ->
-//                Text(text = "${holiday.date}: ${holiday.name}")
-                println("${holiday.date}: ${holiday.name}")
-            }
-        }
-    } ?: run {
-        // データがロード中の場合
-        CircularProgressIndicator()
-    }
+    return holidays!!
+
 
 }
+//[Holiday(date=2023-01-01, name=元日), Holiday(date=2023-01-02, name=休日 元日), Holi

@@ -34,6 +34,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
 import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
+//import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
 //import jp.ac.it_college.std.s22004.calendar.compose.HolidayColor
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import java.time.DayOfWeek
@@ -60,6 +61,7 @@ fun CustomDatePicker(
     var selection by remember { mutableStateOf<CalendarDay?>(null) }
     var isSelected: Boolean by remember { mutableStateOf(false) }
     val context = LocalContext.current
+//    val holidaysList = GetHoliday()
 
     // カレンダーの状態を持つ
     val state = rememberCalendarState(
@@ -69,7 +71,7 @@ fun CustomDatePicker(
         firstDayOfWeek = daysOfWeek.first(),
         outDateStyle = OutDateStyle.EndOfGrid
     )
-    GetHoliday()
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -82,9 +84,9 @@ fun CustomDatePicker(
         HorizontalCalendar(
             state = state,
             // 日付を表示する部分
-            dayContent = {
-                val textColor = when (it.position) {
-                    DayPosition.MonthDate -> when (it.date?.dayOfWeek) {
+            dayContent = { day ->
+                val textColor = when (day.position) {
+                    DayPosition.MonthDate -> when (day.date?.dayOfWeek) {
                         DayOfWeek.SATURDAY -> Color.Blue
                         DayOfWeek.SUNDAY -> Color.Red
                         else -> Color.Unspecified
@@ -93,16 +95,18 @@ fun CustomDatePicker(
                     DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
                     else -> Color.Unspecified
                 }
-//                val holidayColor =
+                val isHoliday = GetHoliday().any { holiday ->
+                    holiday.date == day.date.toString()
+                } ?: false
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
-                        .background(color = if (isSelected) Color.Cyan else Color.Transparent) // ← 追加
+                        .background(color = if (isHoliday) Color.Cyan else Color.Transparent) // ← 追加
                         .border(width = 0.5.dp, color = Color.LightGray)
                         .padding(1.dp)
-                        .clickable(enabled = it.position == DayPosition.MonthDate) {
-                            selectionDay = it.date
-                            selection = it
+                        .clickable(enabled = day.position == DayPosition.MonthDate) {
+                            selectionDay = day.date
+                            selection = day
                             onDayClick(selection!!)
                             println(selection)
                         },
@@ -112,7 +116,7 @@ fun CustomDatePicker(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(top = 3.dp, start = 4.dp),
-                        text = it.date.dayOfMonth.toString() , color = textColor
+                        text = day.date.dayOfMonth.toString() , color = textColor
                     )
 //                    HolidayColor(date = currentMonth.monthValue, holidays = )
 
