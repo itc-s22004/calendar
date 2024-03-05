@@ -6,9 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +40,8 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
 import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
+import jp.ac.it_college.std.s22004.calendar.compose.Holiday
+import jp.ac.it_college.std.s22004.calendar.compose.HolidayItem
 //import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
 //import jp.ac.it_college.std.s22004.calendar.compose.Holiday
 //import jp.ac.it_college.std.s22004.calendar.api.Api
@@ -66,9 +72,8 @@ fun CustomDatePicker(
 
     var selectionDay by remember { mutableStateOf<LocalDate?>(null) }
     var selection by remember { mutableStateOf<CalendarDay?>(null) }
-//    var holidayList by remember {
-//        mutableStateOf<List<Holiday>?>(listOf(Holiday(date = "2023-01-01", name = "元日")))
-//    }
+    val holidays = GetHoliday()
+
 
     // カレンダーの状態を持つ
     val state = rememberCalendarState(
@@ -78,6 +83,7 @@ fun CustomDatePicker(
         firstDayOfWeek = daysOfWeek.first(),
         outDateStyle = OutDateStyle.EndOfGrid
     )
+//    val holidays = GetHoliday()
 //    LaunchedEffect(Unit) {
 //        scope.launch {
 //            val apiDate = Api.getApi().data
@@ -86,7 +92,6 @@ fun CustomDatePicker(
 //            println(apiDate)
 //        }
 //    }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -110,9 +115,10 @@ fun CustomDatePicker(
                     DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
                     else -> Color.Unspecified
                 }
-                val isHoliday = GetHoliday().any { holiday ->                                // 祝日
-                    holiday.date == day.date.toString()
-                } ?: false
+//                val isHoliday = GetHoliday().any { holiday ->                                // 祝日
+//                    holiday.date == day.date.toString()
+//                }
+//                val dayColor = if (isHoliday) Color.Green else Color.Transparent
 
 //                val holiday = GetHoliday().firstOrNull() { holiday ->
 //                    holiday.date == day.date.toString()
@@ -122,7 +128,8 @@ fun CustomDatePicker(
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
-                        .background(color = if (isHoliday) Color.Green else Color.Transparent) // 祝日
+//                        .background(color = if (isHoliday) Color.Green else Color.Transparent) // 祝日
+//                        .background(color = dayColor)
 //                        .border(width = 0.5.dp, color = if (LocalDate.now() == day.date) Color.Black else Color.LightGray)
                         .border(
                             width = if (LocalDate.now() == day.date) 2.dp else 0.5.dp,
@@ -143,17 +150,14 @@ fun CustomDatePicker(
                             .padding(top = 3.dp, start = 4.dp),
                         text = day.date.dayOfMonth.toString(), color = textColor
                     )
-//                    if (isHoliday) {
-//                       Text(holiday!!.name)
-//                    }
-
-//                    val holiday = GetHoliday().firstOrNull() { holiday ->
-//                        holiday.date == day.date.toString()
-//                    }
-
-
+                    LazyColumn() {
+                        items(holidays) { holiday ->
+                            if (holiday.date == day.date.toString()) {
+                                HolidayItem(holiday)
+                            }
+                        }
+                    }
                 }
-
             },
             monthHeader = { month ->
                 DaysOfWeekTitle(daysOfWeek = daysOfWeek)

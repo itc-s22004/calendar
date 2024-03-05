@@ -1,5 +1,11 @@
 package jp.ac.it_college.std.s22004.calendar.compose
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -7,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.google.gson.reflect.TypeToken
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
+
 //import jp.ac.it_college.std.s22004.calendar.api.Api
 
 data class Holiday(
@@ -88,3 +97,8 @@ fun GetHoliday(): List<Holiday> {
 
 }
 ////[Holiday(date=2023-01-01, name=元日), Holiday(date=2023-01-02, name=休日 元日), Holi
+
+@Composable
+fun HolidayItem(holiday: Holiday) {
+    Text(text = holiday.name, style = MaterialTheme.typography.bodySmall)
+}

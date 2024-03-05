@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -36,6 +38,9 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.database.FirebaseDatabase
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
+import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
+import jp.ac.it_college.std.s22004.calendar.compose.Holiday
+import jp.ac.it_college.std.s22004.calendar.compose.HolidayItem
 import jp.ac.it_college.std.s22004.calendar.firebase.addScheduleToFirestore
 import jp.ac.it_college.std.s22004.calendar.firebase.getDate
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
@@ -49,6 +54,7 @@ import java.util.Calendar
 @Composable
 fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
     var openDialog by remember { mutableStateOf(false) }
+    val holidays = GetHoliday()
 
     Column(
         modifier = Modifier
@@ -58,6 +64,15 @@ fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
     ) {
         Text(text = "${calendarDay.date}", fontSize = 50.sp)
         ScheduleDialog(calendarDay.date)
+        LazyColumn {
+            items(holidays) { holiday ->
+                if (holiday.date == calendarDay.date.toString()) {
+                    HolidayItem(holiday)
+                }
+
+
+            }
+        }
         Text(
             text = "予定",
             fontSize = 30.sp,
@@ -197,3 +212,12 @@ fun TimeDialog() {
         time = LocalTime.of(hourOfDay, minuteOfHour)
     }, hour, minute, true).show()
 }
+
+//@Composable
+//fun HolidayItem(holiday: Holiday) {
+//    Column(modifier = Modifier.padding(8.dp)) {
+//        Text(text = "日付: ${holiday.date}", style = MaterialTheme.typography.bodyMedium)
+//        Spacer(modifier = Modifier.height(4.dp))
+//        Text(text = "祝日: ${holiday.name}", style = MaterialTheme.typography.bodyMedium)
+//    }
+//}
