@@ -12,8 +12,13 @@ import com.kizitonwose.calendar.core.CalendarDay
 import java.time.LocalDate
 import java.time.LocalTime
 
-//import jp.ac.it_college.std.s22004.calendar.firebase
 
+
+data class Schedule(
+    val date: String,
+    val time: String,
+    val schedule: String?
+)
 
 fun addScheduleToFirestore(date: LocalDate, time: LocalTime, schedule: String) {
     val db = FirebaseFirestore.getInstance()
@@ -59,8 +64,3 @@ fun getDate(calendarDay: CalendarDay): List<Schedule> {
     }
     return schedulesList
 }
-data class Schedule(
-    val date: String,
-    val time: String,
-    val schedule: String?
-)

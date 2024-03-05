@@ -66,7 +66,7 @@ fun GetHoliday(): List<Holiday> {
     val coroutineScope = rememberCoroutineScope()
     val holidayMap = remember { mutableStateOf<Map<String, String>?>(null) }
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         coroutineScope.launch {
             // APIから祝日データを非同期で取得
             val json = fetchHolidays()
@@ -87,4 +87,4 @@ fun GetHoliday(): List<Holiday> {
 
 
 }
-//[Holiday(date=2023-01-01, name=元日), Holiday(date=2023-01-02, name=休日 元日), Holi
+////[Holiday(date=2023-01-01, name=元日), Holiday(date=2023-01-02, name=休日 元日), Holi
