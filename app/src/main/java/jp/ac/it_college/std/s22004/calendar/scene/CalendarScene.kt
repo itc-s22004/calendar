@@ -1,34 +1,32 @@
 package jp.ac.it_college.std.s22004.calendar.scene
 
-import android.graphics.Paint.Align
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,23 +39,25 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
-import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
-import jp.ac.it_college.std.s22004.calendar.compose.Holiday
-import jp.ac.it_college.std.s22004.calendar.compose.HolidayItem
+import jp.ac.it_college.std.s22004.calendar.component.GetHoliday
+import jp.ac.it_college.std.s22004.calendar.component.HolidayItem
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+import androidx.compose.ui.zIndex
 import kotlin.math.min
+
+//import com.google.accompanist.pager.rememberPagerState
 
 
 @Composable
 fun CustomDatePicker(
     modifier: Modifier = Modifier,
     onDayClick: (CalendarDay) -> Unit = {}
+//    onDayClick: (LocalDate) -> Unit = {}
 ) {
     val currentMonth = remember { YearMonth.now() }
 
@@ -86,9 +86,6 @@ fun CustomDatePicker(
     var stateFirst = state.firstVisibleMonth.yearMonth
 //    var stateFirstLocal: LocalDate = stateFirst.atDay(1)
     val stateFirstLocal = remember { mutableStateOf(stateFirst.atDay(1)) }
-    val limitedDates = remember(currentMonth) {
-        generateLimitedCalendarDays(currentMonth)
-    }
 
 //    val holidays = GetHoliday()
 //    LaunchedEffect(Unit) {
@@ -99,10 +96,16 @@ fun CustomDatePicker(
 //            println(apiDate)
 //        }
 //    }
+    var holi by remember { mutableStateOf("") }
+
+
     Column() {
         Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+//            .weight(1f), // この行を追加
+        ,contentAlignment = Alignment.Center
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -124,6 +127,7 @@ fun CustomDatePicker(
                     Text(text = ">")
                 }
             }
+
 
         }
 
@@ -169,10 +173,14 @@ fun CustomDatePicker(
                     LazyColumn() {
                         items(holidays) { holiday ->
                             if (holiday.date == day.date.toString()) {
-                                HolidayItem(holiday)
+                                Text(
+                                    text = "${HolidayItem(holiday)}",
+                                    fontSize = 14.sp
+                                )
                             }
                         }
                     }
+
                 }
             },
             monthHeader = { month ->
@@ -193,12 +201,17 @@ fun CustomDatePicker(
                 ) {
                     content()
                 }
+
             }
 //            state = state,
 //            dayContent = { Day(it) }
+
         )
+
+
     }
 }
+
 @Composable
 private fun Day(day: CalendarDay) {
     Box(
@@ -253,24 +266,13 @@ fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
     ) {
         for ((index, dayOfWeek) in daysOfWeek.withIndex()) {
             Text(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(top = 4.dp, bottom = 20.dp),
                 textAlign = TextAlign.Center,
                 text = dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
 //                color = getDayOfWeekTextColor(index)
             )
         }
-    }
-}
-
-fun generateLimitedCalendarDays(yearMonth: YearMonth): List<LocalDate> {
-    val startDay = yearMonth.atDay(1)
-    val daysInMonth = yearMonth.lengthOfMonth()
-    val firstDayOfWeek = startDay.dayOfWeek.value
-    val totalDays = daysInMonth + firstDayOfWeek - 1 // 月の日数 + 月の最初の日の週の位置 - 1
-    val daysToShow = min(totalDays, 35) // 最大35日間または月の総日数、小さい方を使用
-
-    return List(daysToShow) { index ->
-        val dayOfMonth = index - firstDayOfWeek + 2 // indexを日に変換
-        startDay.plusDays(dayOfMonth.toLong() - 1)
     }
 }

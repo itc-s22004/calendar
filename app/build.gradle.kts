@@ -104,6 +104,10 @@ dependencies {
     //OkHttp
     implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
+
+    implementation ("com.google.accompanist:accompanist-pager:0.24.7-alpha")
+
+
 //    // Ktor
 //    implementation("io.ktor:ktor-client-core:2.3.6")
 //    implementation("io.ktor:ktor-client-cio:2.3.6")

@@ -1,5 +1,3 @@
-package jp.ac.it_college.std.s22004.calendar.scene
-
 import android.app.TimePickerDialog
 import android.widget.TimePicker
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -38,9 +36,8 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.database.FirebaseDatabase
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
-import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
-import jp.ac.it_college.std.s22004.calendar.compose.Holiday
-import jp.ac.it_college.std.s22004.calendar.compose.HolidayItem
+import jp.ac.it_college.std.s22004.calendar.component.GetHoliday
+import jp.ac.it_college.std.s22004.calendar.component.HolidayItem
 import jp.ac.it_college.std.s22004.calendar.firebase.addScheduleToFirestore
 import jp.ac.it_college.std.s22004.calendar.firebase.getDate
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
@@ -69,8 +66,6 @@ fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
                 if (holiday.date == calendarDay.date.toString()) {
                     HolidayItem(holiday)
                 }
-
-
             }
         }
         Text(
@@ -115,11 +110,6 @@ fun ScheduleDialog(day: LocalDate) {
             title = { Text("スケジュールを追加") },
             text = {
                 Column {
-//                    TextField(
-//                        value = time,
-//                        onValueChange = { time = it },
-//                        label = { Text("時間") }
-//                    )
                     Button(onClick = {
                         val calendar = Calendar.getInstance()
                         val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -127,7 +117,6 @@ fun ScheduleDialog(day: LocalDate) {
                         TimePickerDialog(
                             context,
                             { _: TimePicker, hourOfDay: Int, minuteOfHour: Int ->
-//                            time = "$hourOfDay:$minuteOfHour"
                                 time = LocalTime.of(hourOfDay, minuteOfHour)
                             },
                             hour,
@@ -137,18 +126,6 @@ fun ScheduleDialog(day: LocalDate) {
                     }) {
                         Text(if (time == null) "時間を選択" else time!!.format(timeFormatter))
                     }
-//                    TextField(
-//                        value = time?.format(timeFormatter) ?: "時間を選択",
-//                        onValueChange = { },
-//                        modifier = Modifier
-//                            .focusRequester(focusRequester)
-//                            .combinedClickable {
-//                                openDaiLog = true
-//                            },
-//                        readOnly = true,
-//                        singleLine = true
-//                    )
-
                     TextField(
                         value = schedule,
                         onValueChange = { schedule = it },
@@ -212,12 +189,3 @@ fun TimeDialog() {
         time = LocalTime.of(hourOfDay, minuteOfHour)
     }, hour, minute, true).show()
 }
-
-//@Composable
-//fun HolidayItem(holiday: Holiday) {
-//    Column(modifier = Modifier.padding(8.dp)) {
-//        Text(text = "日付: ${holiday.date}", style = MaterialTheme.typography.bodyMedium)
-//        Spacer(modifier = Modifier.height(4.dp))
-//        Text(text = "祝日: ${holiday.name}", style = MaterialTheme.typography.bodyMedium)
-//    }
-//}
