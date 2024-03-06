@@ -1,5 +1,6 @@
 package jp.ac.it_college.std.s22004.calendar.scene
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,12 +44,6 @@ import com.kizitonwose.calendar.core.daysOfWeek
 import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
 import jp.ac.it_college.std.s22004.calendar.compose.Holiday
 import jp.ac.it_college.std.s22004.calendar.compose.HolidayItem
-//import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
-//import jp.ac.it_college.std.s22004.calendar.compose.Holiday
-//import jp.ac.it_college.std.s22004.calendar.api.Api
-//import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
-//import jp.ac.it_college.std.s22004.calendar.compose.GetHoliday
-//import jp.ac.it_college.std.s22004.calendar.compose.HolidayColor
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
@@ -55,6 +51,8 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
+import kotlin.math.min
+
 
 @Composable
 fun CustomDatePicker(
@@ -73,6 +71,7 @@ fun CustomDatePicker(
     var selectionDay by remember { mutableStateOf<LocalDate?>(null) }
     var selection by remember { mutableStateOf<CalendarDay?>(null) }
     val holidays = GetHoliday()
+    var currentDate by remember { mutableStateOf(LocalDate.now()) }
 
 
     // カレンダーの状態を持つ
@@ -83,6 +82,14 @@ fun CustomDatePicker(
         firstDayOfWeek = daysOfWeek.first(),
         outDateStyle = OutDateStyle.EndOfGrid
     )
+
+    var stateFirst = state.firstVisibleMonth.yearMonth
+//    var stateFirstLocal: LocalDate = stateFirst.atDay(1)
+    val stateFirstLocal = remember { mutableStateOf(stateFirst.atDay(1)) }
+    val limitedDates = remember(currentMonth) {
+        generateLimitedCalendarDays(currentMonth)
+    }
+
 //    val holidays = GetHoliday()
 //    LaunchedEffect(Unit) {
 //        scope.launch {
@@ -92,15 +99,34 @@ fun CustomDatePicker(
 //            println(apiDate)
 //        }
 //    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+    Column() {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Button(onClick = {
+                    currentDate = currentDate.minusMonths(1)
+//                    stateFirstLocal = currentDate
+                    stateFirstLocal.value = currentDate
+//                    println(stateFirstLocal)
+                }) {
+                    Text(text = "<")
+                }
+                Text(
+                    text = "${state.firstVisibleMonth.yearMonth}",
+                    modifier = Modifier.padding(10.dp),
+                    fontSize = 50.sp,
+                )
+                Button(onClick = { /*TODO*/ }) {
+                    Text(text = ">")
+                }
+            }
 
-    ) {
-        Text(
-            text = "${state.firstVisibleMonth.yearMonth}",
-            modifier = Modifier.padding(10.dp),
-            fontSize = 50.sp,
-        )
+        }
+
         HorizontalCalendar(
             state = state,
             // 日付を表示する部分
@@ -115,16 +141,6 @@ fun CustomDatePicker(
                     DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
                     else -> Color.Unspecified
                 }
-//                val isHoliday = GetHoliday().any { holiday ->                                // 祝日
-//                    holiday.date == day.date.toString()
-//                }
-//                val dayColor = if (isHoliday) Color.Green else Color.Transparent
-
-//                val holiday = GetHoliday().firstOrNull() { holiday ->
-//                    holiday.date == day.date.toString()
-//                }
-//                val isHoliday = holiday != null
-
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
@@ -178,9 +194,20 @@ fun CustomDatePicker(
                     content()
                 }
             }
+//            state = state,
+//            dayContent = { Day(it) }
         )
     }
-
+}
+@Composable
+private fun Day(day: CalendarDay) {
+    Box(
+        modifier = Modifier
+            .aspectRatio(1f), // This is important for square sizing!
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = day.date.dayOfMonth.toString())
+    }
 }
 
 @Preview(showBackground = true)
@@ -232,5 +259,18 @@ fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
 //                color = getDayOfWeekTextColor(index)
             )
         }
+    }
+}
+
+fun generateLimitedCalendarDays(yearMonth: YearMonth): List<LocalDate> {
+    val startDay = yearMonth.atDay(1)
+    val daysInMonth = yearMonth.lengthOfMonth()
+    val firstDayOfWeek = startDay.dayOfWeek.value
+    val totalDays = daysInMonth + firstDayOfWeek - 1 // 月の日数 + 月の最初の日の週の位置 - 1
+    val daysToShow = min(totalDays, 35) // 最大35日間または月の総日数、小さい方を使用
+
+    return List(daysToShow) { index ->
+        val dayOfMonth = index - firstDayOfWeek + 2 // indexを日に変換
+        startDay.plusDays(dayOfMonth.toLong() - 1)
     }
 }
