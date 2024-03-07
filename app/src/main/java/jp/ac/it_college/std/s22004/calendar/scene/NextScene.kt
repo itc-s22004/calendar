@@ -1,37 +1,27 @@
+package jp.ac.it_college.std.s22004.calendar.scene
+
 import android.app.TimePickerDialog
 import android.widget.TimePicker
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.database.FirebaseDatabase
 import com.kizitonwose.calendar.core.CalendarDay
@@ -39,18 +29,16 @@ import com.kizitonwose.calendar.core.DayPosition
 import jp.ac.it_college.std.s22004.calendar.component.GetHoliday
 import jp.ac.it_college.std.s22004.calendar.component.HolidayItem
 import jp.ac.it_college.std.s22004.calendar.firebase.addScheduleToFirestore
-import jp.ac.it_college.std.s22004.calendar.firebase.getDate
+import jp.ac.it_college.std.s22004.calendar.firebase.GetDate
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
 
-//import com.google.firebase.database.Fi
 
 @Composable
 fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
-    var openDialog by remember { mutableStateOf(false) }
     val holidays = GetHoliday()
 
     Column(
@@ -64,7 +52,8 @@ fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
         LazyColumn {
             items(holidays) { holiday ->
                 if (holiday.date == calendarDay.date.toString()) {
-                    HolidayItem(holiday)
+                    Text(text = HolidayItem(holiday), fontSize = 30.sp)
+
                 }
             }
         }
@@ -78,7 +67,7 @@ fun NextScene(modifier: Modifier = Modifier, calendarDay: CalendarDay) {
         Box(modifier = Modifier.fillMaxWidth())
         Column(
         ) {
-            getDate(calendarDay).forEach { schedule ->
+            GetDate(calendarDay).forEach { schedule ->
                 Column {
                     Text("${schedule.time}:${schedule.schedule}", fontSize = 30.sp)
                 }
@@ -95,9 +84,7 @@ fun ScheduleDialog(day: LocalDate) {
     var schedule by remember { mutableStateOf("") }
     val context = LocalContext.current
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val currentTime = remember { LocalTime.now() }
     var openDaiLog by remember { mutableStateOf(false) }
-    val focusRequester = remember { FocusRequester() }
 
 
     Button(onClick = { showDialog = true }) {
@@ -170,7 +157,7 @@ fun NextScenePreview() {
     CalendarTheme {
         NextScene(
             Modifier, CalendarDay(
-                date = LocalDate.now(), // 現在の日付
+                date = LocalDate.now(),
                 position = DayPosition.MonthDate
             )
         )

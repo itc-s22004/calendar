@@ -1,6 +1,5 @@
 package jp.ac.it_college.std.s22004.calendar
 
-import NextScene
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -28,6 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.DayPosition
 import jp.ac.it_college.std.s22004.calendar.scene.CustomDatePicker
+import jp.ac.it_college.std.s22004.calendar.scene.NextScene
 import java.time.LocalDate
 
 object Destinations {

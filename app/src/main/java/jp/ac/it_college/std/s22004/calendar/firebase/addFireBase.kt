@@ -1,6 +1,5 @@
 package jp.ac.it_college.std.s22004.calendar.firebase
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -11,8 +10,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.kizitonwose.calendar.core.CalendarDay
 import java.time.LocalDate
 import java.time.LocalTime
-
-
+import java.time.YearMonth
+import java.time.ZoneOffset
 
 data class Schedule(
     val date: String,
@@ -40,7 +39,7 @@ fun addScheduleToFirestore(date: LocalDate, time: LocalTime, schedule: String) {
 }
 
 @Composable
-fun getDate(calendarDay: CalendarDay): List<Schedule> {
+fun GetDate(calendarDay: CalendarDay): List<Schedule> {
     var schedulesList by remember { mutableStateOf(listOf<Schedule>()) }
     val db = FirebaseFirestore.getInstance()
 
@@ -63,4 +62,34 @@ fun getDate(calendarDay: CalendarDay): List<Schedule> {
             }
     }
     return schedulesList
+}
+
+@Composable
+fun GetDateMonth(currentMonth: YearMonth): Map<LocalDate, Int> {
+    var schedulesCountByDay by remember { mutableStateOf(mapOf<LocalDate, Int>()) }
+    val db = FirebaseFirestore.getInstance()
+
+    LaunchedEffect(currentMonth) {
+        val startOfMonth = currentMonth.atDay(1).atStartOfDay(ZoneOffset.UTC).toInstant()
+        val endOfMonth = currentMonth.atEndOfMonth().atTime(LocalTime.MAX).atOffset(ZoneOffset.UTC).toInstant()
+
+        db.collection("schedules")
+            .whereGreaterThanOrEqualTo("date", startOfMonth.toString())
+            .whereLessThanOrEqualTo("date", endOfMonth.toString())
+            .get()
+            .addOnSuccessListener { result ->
+                val tempSchedulesCountByDay = mutableMapOf<LocalDate, Int>()
+
+                for (document in result) {
+                    val dateStr = document.getString("date") ?: continue
+                    val date = LocalDate.parse(dateStr)
+                    val count = tempSchedulesCountByDay.getOrDefault(date, 0)
+                    tempSchedulesCountByDay[date] = count + 1
+                }
+
+                schedulesCountByDay = tempSchedulesCountByDay
+            }
+    }
+    return schedulesCountByDay
+
 }
