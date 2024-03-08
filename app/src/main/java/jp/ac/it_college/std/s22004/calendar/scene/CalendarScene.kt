@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,8 +78,7 @@ fun CustomDatePicker(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
-        ,contentAlignment = Alignment.Center
+                .padding(25.dp), contentAlignment = Alignment.Center
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -88,10 +88,7 @@ fun CustomDatePicker(
                     modifier = Modifier.padding(10.dp),
                     fontSize = 50.sp,
                 )
-
             }
-
-
         }
 
         HorizontalCalendar(
@@ -110,6 +107,7 @@ fun CustomDatePicker(
                 Box(
                     modifier = Modifier
                         .aspectRatio(0.5f)
+                        .background(Color.Transparent)
                         .border(
                             width = if (LocalDate.now() == day.date) 2.dp else 0.5.dp,
                             color = if (LocalDate.now() == day.date) Color.Magenta else Color.LightGray
@@ -133,8 +131,10 @@ fun CustomDatePicker(
                         items(holidays) { holiday ->
                             if (holiday.date == day.date.toString()) {
                                 Text(
-                                    text = "${HolidayItem(holiday)}",
-                                    fontSize = 14.sp
+                                    modifier = modifier.background(color = Color.Yellow),
+                                    text = HolidayItem(holiday),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
@@ -146,7 +146,8 @@ fun CustomDatePicker(
                                 fontSize = 12.sp,
                                 modifier = Modifier
                                     .align(Alignment.BottomEnd)
-                                    .padding(4.dp)
+                                    .padding(4.dp),
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
@@ -182,13 +183,6 @@ fun CustomDatePicker(
 fun StartScenePreview() {
     CalendarTheme {
         CustomDatePicker()
-    }
-}
-
-
-fun DayOfWeek.displayText(uppercase: Boolean = false): String {
-    return getDisplayName(TextStyle.SHORT, Locale.getDefault()).let { value ->
-        if (uppercase) value.uppercase(Locale.getDefault()) else value
     }
 }
 
