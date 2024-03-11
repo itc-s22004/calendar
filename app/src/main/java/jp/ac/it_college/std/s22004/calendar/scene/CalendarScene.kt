@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +32,7 @@ import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.OutDateStyle
 import com.kizitonwose.calendar.core.daysOfWeek
 import jp.ac.it_college.std.s22004.calendar.component.GetHoliday
-import jp.ac.it_college.std.s22004.calendar.component.HolidayItem
+import jp.ac.it_college.std.s22004.calendar.component.Holiday
 import jp.ac.it_college.std.s22004.calendar.firebase.GetDateMonth
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
 import java.time.DayOfWeek
@@ -51,7 +49,7 @@ fun CustomDatePicker(
     val currentMonth = remember { YearMonth.now() }
 
     // 現在より前の年月
-    val startMonth = remember { currentMonth.minusMonths(100) }
+    val startMonth = remember { currentMonth.minusMonths(50) }
     // 現在より後の年月
     val endMonth = remember { currentMonth.plusMonths(100) }
     // 曜日
@@ -59,7 +57,6 @@ fun CustomDatePicker(
 
     var selectionDay by remember { mutableStateOf<LocalDate?>(null) }
     var selection by remember { mutableStateOf<CalendarDay?>(null) }
-    val holidays = GetHoliday()
 
     // カレンダーの状態を持つ
     val state = rememberCalendarState(
@@ -70,8 +67,8 @@ fun CustomDatePicker(
         outDateStyle = OutDateStyle.EndOfGrid
     )
 
+    val holidays = GetHoliday()
     var schedulesCountByDay by remember { mutableStateOf(mapOf<LocalDate, Int>()) }
-
     schedulesCountByDay = GetDateMonth(state.firstVisibleMonth.yearMonth)
 
     Column() {
@@ -90,72 +87,60 @@ fun CustomDatePicker(
                 )
             }
         }
+        DaysOfWeekTitle(daysOfWeek)  //曜日固定
 
         HorizontalCalendar(
             state = state,
             dayContent = { day ->
-                val textColor = when (day.position) {
+                if (day.position == DayPosition.MonthDate || day.position == DayPosition.InDate) {
+                    val textColor = when (day.position) {
                     DayPosition.MonthDate -> when (day.date?.dayOfWeek) {
                         DayOfWeek.SATURDAY -> Color.Blue
                         DayOfWeek.SUNDAY -> Color.Red
                         else -> Color.Unspecified
                     }
 
-                    DayPosition.InDate, DayPosition.OutDate -> Color.LightGray
+                    DayPosition.InDate -> Color.LightGray
+
                     else -> Color.Unspecified
                 }
                 Box(
                     modifier = Modifier
-                        .aspectRatio(0.5f)
+                        .aspectRatio(0.49f)
                         .background(Color.Transparent)
                         .border(
                             width = if (LocalDate.now() == day.date) 2.dp else 0.5.dp,
                             color = if (LocalDate.now() == day.date) Color.Magenta else Color.LightGray
                         )
-                        .padding(1.dp)
+//                        .padding(10.dp)
                         .clickable(enabled = day.position == DayPosition.MonthDate) {
                             selectionDay = day.date
                             selection = day
                             onDayClick(selection!!)
                             println(selection)
                         },
-                    contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(top = 3.dp, start = 4.dp),
-                        text = day.date.dayOfMonth.toString(), color = textColor
-                    )
-                    LazyColumn() {
-                        items(holidays) { holiday ->
-                            if (holiday.date == day.date.toString()) {
-                                Text(
-                                    modifier = modifier.background(color = Color.Yellow),
-                                    text = HolidayItem(holiday),
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-                    }
+//                        Text(
+//                            modifier = Modifier
+////                                .background(color = )
+//                                .padding(top = 3.dp, start = 4.dp),
+//                            text = day.date.dayOfMonth.toString(), color = textColor
+//                        )
+                    CalendarDay(day = day, holidays = holidays, textColor = textColor)
+
                     schedulesCountByDay[day.date]?.let { count ->
                         if (count > 0) {
                             Text(
-                                text = "予定: $count",
+                                text = "予定：$count",
                                 fontSize = 12.sp,
                                 modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(4.dp),
+                                    .padding(start = 2.dp, top = 30.dp),
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
-
                 }
-            },
-            monthHeader = { month ->
-                DaysOfWeekTitle(daysOfWeek = daysOfWeek)
+                }
             },
             monthBody = { _, content ->
                 Box(
@@ -187,7 +172,7 @@ fun StartScenePreview() {
 }
 
 @Composable
-fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
+fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {  //　月加水木金同日
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -202,4 +187,19 @@ fun DaysOfWeekTitle(daysOfWeek: List<DayOfWeek>) {
             )
         }
     }
+}
+
+@Composable
+fun CalendarDay(day: CalendarDay, holidays: List<Holiday>, textColor: Color) { // 祝日表示変えた
+    val isHoliday = holidays.any { holiday ->
+        holiday.date == day.date.toString()
+    }
+
+    Text(
+        modifier = Modifier
+            .background(color = if (isHoliday) Color.Yellow else Color.Transparent)
+            .padding(top = 3.dp, start = 4.dp),
+        text = day.date.dayOfMonth.toString(),
+        color = textColor
+    )
 }
