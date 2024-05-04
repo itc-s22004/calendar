@@ -9,17 +9,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,6 +39,7 @@ import jp.ac.it_college.std.s22004.calendar.component.GetHoliday
 import jp.ac.it_college.std.s22004.calendar.component.Holiday
 import jp.ac.it_college.std.s22004.calendar.firebase.GetDateMonth
 import jp.ac.it_college.std.s22004.calendar.ui.theme.CalendarTheme
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -71,6 +76,8 @@ fun CustomDatePicker(
     var schedulesCountByDay by remember { mutableStateOf(mapOf<LocalDate, Int>()) }
     schedulesCountByDay = GetDateMonth(state.firstVisibleMonth.yearMonth)
 
+    val coroutineScope = rememberCoroutineScope()
+
     Column() {
         Box(
             modifier = Modifier
@@ -85,6 +92,18 @@ fun CustomDatePicker(
                     modifier = Modifier.padding(10.dp),
                     fontSize = 50.sp,
                 )
+                Button(modifier = Modifier
+                    .size(100.dp)
+                    .padding(start = 8.dp), // 左側にパディングを追加して幅を開ける
+                    onClick = {
+                        // コルーチンスコープ内でsuspend関数を呼び出す
+                        coroutineScope.launch {
+                            state.scrollToMonth(currentMonth)
+                        }
+                    }
+                ) {
+                    Text("戻る")
+                }
             }
         }
         DaysOfWeekTitle(daysOfWeek)  //曜日固定
